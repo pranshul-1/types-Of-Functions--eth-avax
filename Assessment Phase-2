@@ -1,1 +1,64 @@
+//in this phase of Assessment we will deploy the contract and then interacting with the contract
+//so noow deploy the contract
+
+// scripts/deploy.js
+async function main() {
+    const [deployer] = await ethers.getSigners();
+
+    console.log("Deploying contracts with the account:", deployer.address);
+
+    const Token = await ethers.getContractFactory("MyToken");
+    const token = await Token.deploy("MyToken", "MTK");
+
+    await token.deployed();
+
+    console.log("Token deployed to:", token.address);
+}
+
+main()
+.then(() => process.exit(0))
+.catch((error) => {
+    console.error(error);
+    process.exit(1);
+});
+
+//Interacting with the deployed contract
+// scripts/interact.js
+async function main() {
+    const [owner, addr1] = await ethers.getSigners();
+    const contractAddress = "YOUR_DEPLOYED_CONTRACT_ADDRESS";
+
+    const Token = await ethers.getContractFactory("MyToken");
+    const token = await Token.attach(contractAddress);
+
+    // Mint tokens
+    let tx = await token.mint(addr1.address, ethers.utils.parseUnits("100", 18));
+    await tx.wait();
+    console.log("Minted 100 tokens to", addr1.address);
+
+    // Check balance
+    let balance = await token.balanceOf(addr1.address);
+    console.log("Balance of addr1:", ethers.utils.formatUnits(balance, 18));
+
+    // Transfer tokens
+    tx = await token.connect(addr1).transfer(owner.address, ethers.utils.parseUnits("50", 18));
+    await tx.wait();
+    console.log("Transferred 50 tokens from addr1 to owner");
+
+    // Burn tokens
+    tx = await token.connect(addr1).burn(ethers.utils.parseUnits("25", 18));
+    await tx.wait();
+    console.log("Burned 25 tokens from addr1");
+
+    // Check final balance
+    balance = await token.balanceOf(addr1.address);
+    console.log("Final balance of addr1:", ethers.utils.formatUnits(balance, 18));
+}
+
+main()
+.then(() => process.exit(0))
+.catch((error) => {
+    console.error(error);
+    process.exit(1);
+});
 
