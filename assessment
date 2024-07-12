@@ -1,1 +1,32 @@
+//very firstly we will initialise the new project
+mkdir erc20-token
+cd erc20-token
+npm init -y
+
+//here installing hardhat
+npm install --save-dev hardhat @nomiclabs/hardhat-ethers ethers @openzeppelin/contracts
+
+//here creating a hardhat project
+npx hardhat
+
+///now creating a ERC20 token conntract
+// contracts/MyToken.sol
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MyToken is ERC20, Ownable {
+    constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
+
+    function mint(address to, uint256 amount) public onlyOwner {
+        _mint(to, amount);
+    }
+
+    function burn(uint256 amount) public {
+        _burn(msg.sender, amount);
+    }
+}
+
 
